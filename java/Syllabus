@@ -1,1 +1,27 @@
-
+                     **Advanced Java Programming**
+1. **Basics of Core JAVA**: class, interface, exception handling.Collections : Collection Interfaces,
+Concrete
+Collections, The Collections Framework Multithreading : Creating thread and running it, Multiple
+Thread acting on single object,Synchronization, Thread communication, Thread group, Thread priorities,
+Daemon Thread, Life Cycle of Thread.
+2. **Networking**:Internet Addressing, InetAddress, Factory Methods, Instance Methods, TCP/IP Client
+Sockets, URL, URL Connection, TCP/IP Server Sockets, Datagrams.Java Database Connectivity
+(JDBC): Merging Data from Multiple Tables: Joining, Manipulating, Databases with JDBC, Prepared
+Statements, Transaction Processing, Stored Procedures.
+3. **Servlets**: Servlet Overview and Architecture, Interface Servlet and the Servlet Life Cycle,
+HandlingHTTP get Requests, Handling HTTP post Requests, Redirecting Requests to Other Resources,
+Session Tracking, Cookies, Session Tracking with HttpSession
+4. **Java Server Pages (JSP)**: Introduction, JavaServer Pages Overview, A First JavaServer Page Example,
+Implicit Objects, Scripting, Standard Actions, Directives, Custom Tag Libraries, Enterprise Java Bean:
+Preparing a Class to be a JavaBean, Creating a JavaBean, JavaBean Properties,Types of beans, Stateful
+Session bean, Stateless Session bean, Entity bean
+5. **Remote Method Invocation**: Defining the Remote Interface, Implementing the Remote Interface,
+Compiling and Executing the Server and the Client, Struts: Basics of Struts,Struts : What and Why?
+,Model1 vs Model2 ,Struts2 Features, Steps to create Struts application ,Understanding Action class
+,Understanding struts.xml file
+Readings:
+1. “Advanced Java 2 Platform HOW TO PROGRAM” by H. M.Deitel, P. J. Deitel, S. E. Santry – Prentice
+Hall
+2. “Beginning Java™ EE 6 Platform with GlassFish 3 From Novice to Professional” by Antonio
+Goncalves
+– Apress publication
