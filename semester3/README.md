@@ -1,183 +1,188 @@
+# Skin Cancer Classification (9 Classes) – Semester 3
 
-# Semester 3 – Skin Cancer Classification (9 Classes)
+This project builds an end-to-end **Skin Cancer Classification** pipeline using deep learning (**EfficientNetB2 + TensorFlow**), from dataset preparation to model serving via **FastAPI**.
 
-This project implements a **9-class skin Cancer classification pipeline** using **TensorFlow + EfficientNetB2**, with:
-
-- Dataset balancing via offline augmentation
-- Model training and fine-tuning
-- Verification (classification report + confusion matrix + misclassified samples)
-- FastAPI backend for inference
+It is designed for local execution, where users download two public datasets, merge class folders, balance class counts, train the model, verify performance, and run inference API.
 
 ---
 
-## Classes
+## Project Objective
 
-The classifier predicts one of the following Cancer classes:
+Classify dermoscopic skin images into **9 skin cancer-related classes**:
 
-1. actinic_keratosis  
-2. basal_cell_carcinoma  
-3. dermatofibroma  
-4. melanoma  
-5. nevus  
-6. pigmented_benign_keratosis  
-7. seborrheic_keratosis  
-8. squamous_cell_carcinoma  
-9. vascular_lesion
+1. `actinic_keratosis`
+2. `basal_cell_carcinoma`
+3. `dermatofibroma`
+4. `melanoma`
+5. `nevus`
+6. `pigmented_benign_keratosis`
+7. `seborrheic_keratosis`
+8. `squamous_cell_carcinoma`
+9. `vascular_lesion`
 
 ---
 
 ## Dataset Sources
 
-As described in `about.txt`, the dataset is assembled from:
+Download these datasets locally:
 
-- HAM10000: https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000
-- Additional 9-class skin dataset: https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
+- HAM10000:  
+  https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000
+- ISIC-style 9-class dataset:  
+  https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
 
-After merging/filtering, classes are balanced using augmentation to target approximately **500 images per class**.
+You must manually **merge and organize** the images into a single folder structure (shown below).
 
 ---
 
-## Project Structure
+## Required Dataset Structure
+
+Your local dataset must be arranged as:
+
+```text
+dataset/
+  actinic_keratosis/
+  basal_cell_carcinoma/
+  dermatofibroma/
+  melanoma/
+  nevus/
+  pigmented_benign_keratosis/
+  seborrheic_keratosis/
+  squamous_cell_carcinoma/
+  vascular_lesion/
+```
+
+> In short: `dataset/class1/class2/...` is not valid.  
+> It must be **one root dataset folder** with **9 class subfolders**, and each class folder contains images.
+
+---
+
+## Repository Structure
 
 ```text
 semester3/
   app.py                 # FastAPI inference API
-  augmentation.py        # Offline class balancing script
-  train_model.py         # EfficientNetB2 training + fine-tuning
-  verification.py        # Evaluation and error analysis
-  about.txt              # Methodology and dataset notes
-  README.md
-  Results/               # Output plots/screenshots
+  augmentation.py        # Augments minority classes to target count
+  train_model.py         # Training + fine-tuning (EfficientNetB2)
+  verification.py        # Evaluation (report + confusion matrix + errors)
+  about.txt              # Dataset/workflow explanation
+  requirements.txt
+  .env
+  Results/               # Saved plots/screenshots
+  models/                # (local) trained model file goes here
 ```
 
 ---
 
-## Setup
+## Setup Instructions
 
-### 1) Create virtual environment
+## 1) Clone repository
 
 ```bash
-python -m venv .venv
+git clone https://github.com/yogesh0x/mca.git
+cd mca/semester3
 ```
 
-Activate:
+## 2) Create and activate virtual environment
 
-- Windows:
-```bash
+### Windows (PowerShell)
+```powershell
+python -m venv .venv
 .venv\Scripts\activate
 ```
 
-- macOS/Linux:
+### Linux/macOS
 ```bash
+python -m venv .venv
 source .venv/bin/activate
 ```
 
-### 2) Install dependencies
+## 3) Install dependencies
 
 ```bash
-pip install tensorflow fastapi uvicorn scikit-learn matplotlib seaborn numpy
-```
-
-(Optional) Save lock file:
-```bash
-pip freeze > requirements.txt
+pip install -r requirements.txt
 ```
 
 ---
 
-## Config (Universal Paths)
+## Environment Configuration
 
-Use environment variables instead of hardcoded local paths:
+Update `.env` in `semester3/`:
 
-- `DATASET_PATH` → directory containing class folders
-- `MODEL_PATH` → `.keras` trained model file
-- `RESULTS_DIR` → output directory for plots/reports
-
-### Example (Windows PowerShell)
-
-```powershell
-$env:DATASET_PATH="D:\dataset\skin9"
-$env:MODEL_PATH="D:\models\efficientnetb2_80plus.keras"
-$env:RESULTS_DIR="D:\outputs\results"
+```env
+DATASET_PATH=./data/dataset
+MODEL_PATH=./models/efficientnetb2_80plus.keras
+RESULTS_DIR=./Results
+BATCH_SIZE=16
+TARGET_COUNT=500
+MODEL_NAME=efficientnetb2_80plus.keras
+SEED=42
 ```
 
-### Example (Linux/macOS)
-
-```bash
-export DATASET_PATH="/home/user/dataset/skin9"
-export MODEL_PATH="/home/user/models/efficientnetb2_80plus.keras"
-export RESULTS_DIR="/home/user/outputs/results"
-```
-
-If not set, scripts can default to local project-relative paths like:
-- `./data/dataset`
-- `./models/efficientnetb2_80plus.keras`
-- `./Results`
+### Important
+- `DATASET_PATH` must point to the merged folder containing all 9 class subfolders.
+- Trained model file is not committed due to size (~95MB), so you must train locally or provide your own model file path.
 
 ---
 
-## Workflow
+## Complete Workflow (Run Order)
 
-### 1) Balance dataset (optional, if imbalanced)
+## Step 1: Prepare & merge datasets locally
+- Download both datasets
+- Merge into one root folder with 9 class directories
+- Ensure class names match expected labels
 
+## Step 2: Balance classes using augmentation
 ```bash
-python semester3/augmentation.py
+python augmentation.py
 ```
+This expands lower-count classes up to `TARGET_COUNT` (default 500).
 
-### 2) Train model
-
+## Step 3: Train model
 ```bash
-python semester3/train_model.py
+python train_model.py
 ```
+- Uses `image_dataset_from_directory`
+- 80/20 training-validation split
+- Warmup + fine-tuning strategy
+- Saves best model to `MODEL_PATH` (or `models/` default)
 
-Best model is saved as `.keras` (via ModelCheckpoint).
-
-### 3) Verify model performance
-
+## Step 4: Verify model performance
 ```bash
-python semester3/verification.py
+python verification.py
 ```
+Outputs:
+- classification report
+- confusion matrix image
+- misclassified sample images
 
-Generates:
-- confusion matrix
-- classification report output
-- misclassified image samples
-
-### 4) Run API server
-
+## Step 5: Run inference API
 ```bash
-python semester3/app.py
+python app.py
 ```
-
-or:
-
+or
 ```bash
-uvicorn semester3.app:app --host 0.0.0.0 --port 8000
+uvicorn app:app --host 0.0.0.0 --port 8000
 ```
 
 ---
 
 ## API Usage
 
-### Endpoint
+### Health Check
+`GET /health`
 
-`POST /predict`
+### Prediction Endpoint
+`POST /predict` with form-data image file (`file`)
 
-### Request
-Multipart form with one image file:
-- field name: `file`
-
-### Example (curl)
-
+### Example cURL
 ```bash
 curl -X POST "http://127.0.0.1:8000/predict" \
   -H "accept: application/json" \
-  -H "Content-Type: multipart/form-data" \
   -F "file=@sample.jpg"
 ```
 
-### Example response
-
+### Example Response
 ```json
 {
   "prediction": "melanoma",
@@ -187,18 +192,24 @@ curl -X POST "http://127.0.0.1:8000/predict" \
 
 ---
 
-## Notes
+## Notes for Contributors / Users
 
-- Trained model file (~95MB) is not committed due to GitHub size/practical limits.
-- Keep trained weights in `models/` locally and provide path via `MODEL_PATH`.
-- This is an academic/research project and **not a clinical diagnostic tool**.
+- This project is educational/research-oriented.
+- It is **not** a certified medical diagnostic system.
+- If class names differ in your downloaded dataset, rename folders to match expected class labels before training.
+- Keep large model files in local `models/` folder (or external storage), not in Git commit history.
 
 ---
 
-## Future Improvements
+## Recommended Next Improvements
 
-- Add `requirements.txt` and pinned versions
-- Add `.env` support with `python-dotenv`
-- Add training history plot export (loss/accuracy curves)
-- Add per-class precision/recall/F1 CSV export
-- Add Dockerfile for one-command API deployment
+- Add `class_names.json` export during training and load it in API (to avoid hardcoded class order mismatch)
+- Save evaluation metrics as CSV/JSON in addition to plots
+- Add Docker support for one-command deployment
+- Add Grad-CAM explainability for medical image interpretation
+
+---
+
+## Author Context
+
+This project was developed as part of MCA Semester 3 coursework focused on practical deep learning and deployment workflow for skin cancer image classification.
