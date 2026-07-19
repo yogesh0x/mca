@@ -1,0 +1,54 @@
+used dataset links: 
+https://www.kaggle.com/datasets/kmader/skin-cancer-mnist-ham10000
+https://www.kaggle.com/datasets/nodoubttome/skin-cancer9-classesisic
+
+
+The development of the nine-class skin cancer detection system followed a structured multi-stage workflow
+consisting of dataset preparation, class balancing, model training, backend deployment, and performance
+verification. Each step was designed to create a reliable and reproducible pipeline for handling medical-
+grade images and training a deep learning classifier.
+3.1 Dataset Collection and Merging
+Two different sources were used for assembling the dataset:
+ HAM10000 dataset (used for AKIEC, BCC, DF, MEL, NV, VASC)
+ Another dermatology image dataset (used for classes missing in HAM10000 such as SCC, PBK,
+SK)
+Since the number of samples per class varied significantly, you constructed a combined dataset with the
+following counts before balancing:
+Class From HAM10000 (A) From Other Source (B) Total (Before Balancing)
+Actinic Keratosis (AKIEC) 327 130 329 (after filtering)
+Basal Cell Carcinoma (BCC) 514 392 514 (filtered)
+Dermatofibroma (DF) 115 111 115 (filtered)
+Melanoma (MEL) 1113 → filtered to 50 + 454 – 504
+Nevus (NV) 6705 → filtered to 140 + 373 – 513
+Vascular Lesion 142 – 142
+Squamous Cell Carcinoma – 197 197
+Seborrheic Keratosis – 80 80
+Pigmented Benign Keratosis – 478 478
+Classes with extremely high counts were filtered down to maintain dataset size and class diversity.
+This ensured a manageable and balanced starting point before augmentation.
+3.2 Dataset Balancing Through Augmentation
+Because several classes had far fewer samples (some as low as 80), a dedicated augmentation script was
+used to expand every class to exactly 500 images, ensuring uniform representation during training.
+20
+my augmentation script applied transformations such as rotation, shifting, shear,
+zoom, and flips, and generated new images until the target count was reached.
+The process was repeated automatically for every class folder.
+
+
+The augmentation process ensured:
+ Balanced dataset (500 images × 9 classes = 4,500 images total)
+ Increased robustness of the model
+ Reduced overfitting due to higher variety in training images
+This balancing step was critical because deep learning models perform poorly when trained on imbalanced
+datasets.
+
+Instead, the training script used TensorFlow’s built-in image_dataset_from_directory() with an 80–20
+training-validation split:
+validation_split=0.20,
+subset="training"
+and
+subset="validation"
+This ensured:
+ Random but consistent distribution of all classes
+ Equal representation across training and validation
+ No human error in splitting
